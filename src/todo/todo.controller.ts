@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Patch } from '@nestjs/common';
 import { TodoService } from './todo.service';
 
 @Controller('todos')
@@ -28,6 +28,14 @@ export class TodoController {
     @Body('isCompleted') isCompleted: boolean,
   ) {
     return this.todoService.update(Number(id), title, isCompleted);
+  }
+
+  @Patch(':id')
+  partialUpdate(
+    @Param('id') id: string,
+    @Body() updateFields: Partial<{ title: string; isCompleted: boolean }>,
+  ) {
+    return this.todoService.partialUpdate(Number(id), updateFields);
   }
 
   @Delete(':id')

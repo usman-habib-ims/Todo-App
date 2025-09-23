@@ -16,10 +16,12 @@ export class TodoService {
     return this.todoRepo.find();
   }
 
-  create(title: string) {
-    const todo = new Todo();
-    todo.title = title;
-    return this.todoRepo.save(todo);
+
+  async create(title: string): Promise<Todo> {
+    const todo = this.todoRepo.create({ title });
+    const saved = await this.todoRepo.save(todo);
+    console.log('All Todos:', await this.todoRepo.find()); // 👈 Print todos to console
+    return saved;
   }
 
   // Get one todo
@@ -42,7 +44,19 @@ export class TodoService {
     return this.todoRepo.save(todo);
   }
 
-    // Delete todo
+ async partialUpdate(
+    id: number,
+    updateFields: Partial<{ title: string; isCompleted: boolean }>,
+  ) {
+    const todo = await this.todoRepo.findOneBy({ id });
+    if (!todo) {
+      throw new NotFoundException(`Todo with id ${id} not found`);
+    }
+    Object.assign(todo, updateFields);
+    return this.todoRepo.save(todo);
+  }
+
+  // Delete todo
   delete(id: number) {
     return this.todoRepo.delete(id).then(() => {});
   }
